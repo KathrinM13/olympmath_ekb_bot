@@ -10,6 +10,11 @@ public class TasksStorage implements Storage<Task> {
 		tasks = new ArrayList<Task>();
 	}
 	
+	public TasksStorage(ArrayList<Task> tasks) {
+		this.tasks = tasks;
+	}
+
+	
 	@Override
 	public Task getById(int id) {
 		try {

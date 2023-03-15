@@ -14,6 +14,9 @@ import main.java.models.User;
 import main.java.wrappers.WrappedUpdate;
 
 public class ChoseeTaskOrTheoryHandler implements Handler {
+	
+	public static final int THEORY_OPTION = 1;
+	public static final int TASK_OPTION = 2;
 
 	Storage<Task> tasks;
 	AnswerGenerator answerGenerator;
@@ -24,29 +27,35 @@ public class ChoseeTaskOrTheoryHandler implements Handler {
 	}
 	
 	@Override
-	public State handledState() {
-		return State.CHOOSE_TASK_OR_THEORY;
+	public boolean isHandled(State state) {
+		return state == State.CHOOSE_TASK_OR_THEORY;
 	}
 
 	@Override
 	public String handleMessage(User user, WrappedUpdate update) {
-		if(isStantardCommand(update.getMessage())) {
-			return handleStantardCommand(user, update, answerGenerator);
-		}
-		
 		int option;
 
 		try {
 			option = Integer.parseInt(update.getMessage());
-			if(option == 1) {
+			if(option == THEORY_OPTION) {
 				return user.getTheme().getTheory().concat("\n").concat(answerGenerator.generateAnswerForUser(user));
 			}
-			else if(option == 2) {
-				user.setState(State.SOLVE_TASK);
+			else if(option == TASK_OPTION) {
 				ArrayList<Task> filteredTasks = getTasksFilteredByTheme(user.getTheme().getName());
-				Task task = filteredTasks.get(ThreadLocalRandom.current().nextInt(0, filteredTasks.size()));
-				user.setTask(task);
-				return answerGenerator.generateAnswerForUser(user);
+				for(int i = 0; i < user.getSolvedTasks().size(); i++) {
+					filteredTasks = this.getTasksFilteredByStatement(user.getSolvedTasks().get(i).getStatement(), filteredTasks);
+				}
+				if(filteredTasks.size() > 0) {
+					user.setState(State.SOLVE_TASK);
+					Task task = filteredTasks.get(ThreadLocalRandom.current().nextInt(0, filteredTasks.size()));
+					user.setTask(task);
+					return answerGenerator.generateAnswerForUser(user);
+				}
+				else {
+					user.setState(State.CHOOSE_THEME);
+					user.setTheme(null);
+					return answerGenerator.generateAnswerForMistake(Mistake.EMPTY_TASKS_LIST).concat(answerGenerator.generateAnswerForUser(user));
+				}
 			}
 			else {
 				return answerGenerator.generateAnswerForMistake(Mistake.WRONG_OPTION).concat(answerGenerator.generateAnswerForUser(user));
@@ -62,6 +71,16 @@ public class ChoseeTaskOrTheoryHandler implements Handler {
 		for(int i = 0; i < tasks.getSize(); i++) {
 			Task t = tasks.getById(i);
 			if(t.getTheme().equalsIgnoreCase(themeName))
+				filteredTasks.add(t);
+		}
+		return filteredTasks;
+	}
+	
+	private ArrayList<Task> getTasksFilteredByStatement(String statement, ArrayList<Task> tasksForFiltration) {
+		ArrayList<Task> filteredTasks = new ArrayList<>();
+		for(int i = 0; i < tasksForFiltration.size(); i++) {
+			Task t = tasksForFiltration.get(i);
+			if(!t.getStatement().equalsIgnoreCase(statement))
 				filteredTasks.add(t);
 		}
 		return filteredTasks;

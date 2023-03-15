@@ -9,9 +9,11 @@ public class UpdateReceiver {
 	
 	private List<Handler> handlers;
 	private ConcurrentHashMap<String, User> chatIdToUser;
+	private AnswerGenerator answerGenerator;
 	
-	public UpdateReceiver(List<Handler> handlers) {
+	public UpdateReceiver(List<Handler> handlers, AnswerGenerator answerGenerator) {
 		this.handlers = handlers;
+		this.answerGenerator = answerGenerator;
 		chatIdToUser = new ConcurrentHashMap<>();
 	}
 	
@@ -22,14 +24,18 @@ public class UpdateReceiver {
 			chatIdToUser.put(chatId, new User(chatId));
 		}
 		User user = chatIdToUser.get(chatId);
+		
+		Handler handler = getHandlerByState(user.getState());
+		if(handler.isStantardCommand(update.getMessage())) {
+			return handler.handleStantardCommand(user, update, answerGenerator);
+		}
 
 		return getHandlerByState(user.getState()).handleMessage(user, update);
 	}
 	
 	private Handler getHandlerByState(State state) {
 		return handlers.stream()
-				.filter(handler -> handler.handledState() != null)
-				.filter(handler -> handler.handledState().equals(state))
+				.filter(handler -> handler.isHandled(state))
 				.findAny()
 				.orElseThrow(UnsupportedOperationException::new);
 	}

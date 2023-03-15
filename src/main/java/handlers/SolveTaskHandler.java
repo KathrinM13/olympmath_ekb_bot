@@ -16,18 +16,22 @@ public class SolveTaskHandler implements Handler {
 	}
 
 	@Override
-	public State handledState() {
-		return State.SOLVE_TASK;
+	public boolean isHandled(State state) {
+		return state == State.SOLVE_TASK;
 	}
 
 	@Override
 	public String handleMessage(User user, WrappedUpdate update) {
-		if(isStantardCommand(update.getMessage())) {
-			return handleStantardCommand(user, update, answerGenerator);
-		}
 		
 		if(update.getMessage().equalsIgnoreCase("решение")) {
-			return user.getTask().getAnswer();
+			String answer = user.getTask().getDecision().concat("\n");
+			user.rememberTask();
+			user.resetTheme();
+			return answer.concat(answerGenerator.generateAnswerForUser(user));
+		}
+		else if(update.getMessage().equalsIgnoreCase("ответ")) {
+			user.setState(State.HAS_ANSWER);
+			return answerGenerator.generateAnswerForUser(user);
 		}
 		else {
 			return answerGenerator.generateAnswerForMistake(Mistake.WRONG_OPTION).concat(answerGenerator.generateAnswerForUser(user));

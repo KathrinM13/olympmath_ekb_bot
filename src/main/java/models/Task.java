@@ -4,12 +4,14 @@ public class Task {
 	
 	private String theme;
 	private String statement;
-	private String answer;
+	private String decision;
+	private int answer;
 	
-	public Task(String theme, String statement, String Answer) {
+	public Task(String theme, String statement, String decision, int answer) {
 		this.setTheme(theme);
 		this.setStatement(statement);
-		this.setAnswer(Answer);
+		this.setDecision(decision);
+		this.setAnswer(answer);
 	}
 
 	public String getTheme() {
@@ -28,11 +30,19 @@ public class Task {
 		this.statement = statement;
 	}
 
-	public String getAnswer() {
+	public String getDecision() {
+		return decision;
+	}
+
+	public void setDecision(String decision) {
+		this.decision = decision;
+	}
+
+	public int getAnswer() {
 		return answer;
 	}
 
-	public void setAnswer(String answer) {
+	public void setAnswer(int answer) {
 		this.answer = answer;
 	}
 }

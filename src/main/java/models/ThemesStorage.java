@@ -4,10 +4,14 @@ import java.util.ArrayList;
 
 public class ThemesStorage implements Storage<Theme> {
 	
-	ArrayList<Theme> themes;
+	private ArrayList<Theme> themes;
 	
 	public ThemesStorage() {
 		themes = new ArrayList<Theme>();
+	}
+	
+	public ThemesStorage(ArrayList<Theme> themes) {
+		this.themes = themes;
 	}
 
 	@Override

@@ -21,16 +21,12 @@ public class ChooseThemeHandler implements Handler {
 	}
 
 	@Override
-	public State handledState() {
-		return State.CHOOSE_THEME;
+	public boolean isHandled(State state) {
+		return state == State.CHOOSE_THEME;
 	}
 
 	@Override
 	public String handleMessage(User user, WrappedUpdate update) {
-		if(isStantardCommand(update.getMessage())) {
-			return handleStantardCommand(user, update, answerGenerator);
-		}	
-
 		Theme theme = themes.getAll().stream()
 				.filter(th -> th.getName().equalsIgnoreCase(update.getMessage()))
 				.findAny()

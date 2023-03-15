@@ -7,7 +7,7 @@ public interface Handler {
     public static final String HELP = "/help";
     public static final String START = "/start";
 
-	State handledState();
+	boolean isHandled(State state);
 	String handleMessage(User user, WrappedUpdate update);
 	
 	default String handleStantardCommand(User user, WrappedUpdate update, AnswerGenerator answerGenerator) {
