@@ -29,9 +29,10 @@ public class ChooseThemeHandler implements Handler {
 	public String handleMessage(User user, WrappedUpdate update) {
 		Theme theme = themes.getAll().stream()
 				.filter(th -> th.getName().equalsIgnoreCase(update.getMessage()))
+				.filter(th -> th.getGrade() == user.getGrade())
 				.findAny()
 				.orElse(null);
-		if(theme != null && theme.getGrade() == user.getGrade()) {
+		if(theme != null) {
 			user.setTheme(theme);
 			user.setState(State.CHOOSE_TASK_OR_THEORY);
 			return answerGenerator.generateAnswerForUser(user);
